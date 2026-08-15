@@ -23,7 +23,7 @@ export default function Whitelist() {
                 const file = input.current.files[0]
                 let formData = new FormData()
                 formData.append("file", file)
-                const result = await fetch("https://api.champions.dev/upload", {
+                const result = await fetch("https://api.champions.gd/upload", {
                     method: "POST",
                     body: formData
                 })
