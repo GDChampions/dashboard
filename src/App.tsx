@@ -1,41 +1,48 @@
 import { useRef, useState } from 'react'
+import Whitelist from './Whitelist';
+import BuildIDs from './BuildIDs';
 
-type Response = {
-    message: string
-    rowCount: number
-    data: any
+function SidebarItem({ text, callback, isActive }: { text: string, callback: () => void, isActive: boolean }) {
+    return (
+        <div className={`sidebar-item ${isActive ? "active" : ""}`} onClick={callback}>
+            {text}
+        </div>
+    )
 }
 
 function App() {
-    const input = useRef<HTMLInputElement>(null);
-    const [result, setResult] = useState<Response | null>(null);
+    const [activeTab, setActiveTab] = useState("whitelist");
 
-    return <div>
-        <center>
-            <h1>Champions Whitelist Manager</h1>
-            <p>only for super cool internal people</p>
-
-            <h3>File Upload</h3>
-            <input type="file" name="whitelists" ref={input} />
-            <button type="button" onClick={async (e) => {
-                if (!input.current || !input.current.files || !input.current.files[0]) return
-
-                const file = input.current.files[0]
-                let formData = new FormData()
-                formData.append("file", file)
-                const result = await fetch("http://localhost:41010/upload", {
-                    method: "POST",
-                    body: formData
-                })
-                setResult(await result.json())
-            }}>Submit</button>
-
-            {result && <>
-                <p>Server responded with: <b>{result.message}</b></p>
-                <p>Users updated: <b>{result.rowCount}</b></p>
-            </>}
-        </center>
-    </div>
+    return <main>
+        <div className="sidebar">
+            <SidebarItem
+                text='Whitelist'
+                callback={() => {
+                    setActiveTab("whitelist")
+                }}
+                isActive={activeTab == "whitelist"}
+            />
+            <SidebarItem
+                text='Build IDs'
+                callback={() => {
+                    setActiveTab("build-ids")
+                }}
+                isActive={activeTab == "build-ids"}
+            />
+        </div>
+        <div className="content">
+            {(() => {
+                switch (activeTab) {
+                    case "whitelist": 
+                        return <Whitelist />
+                    case "build-ids":
+                        return <BuildIDs />
+                    default:
+                        return <p>Unable to find page</p>
+                }
+            })()}
+        </div>
+    </main>
 }
 
 export default App
